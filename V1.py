@@ -17,10 +17,6 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
 
-# ============================================================
-# CONFIGURATION
-# ============================================================
-
 load_dotenv()
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
@@ -41,17 +37,12 @@ client = OpenAI(
 )
 
 
-# ============================================================
-# SYNTHÈSE VOCALE
-# ============================================================
-
 def parler(texte):
     tts = pyttsx3.init("sapi5")
 
     voices = tts.getProperty("voices")
 
     if voices:
-        # Force Microsoft Hortense
         tts.setProperty("voice", voices[0].id)
 
     tts.setProperty("rate", 150)
@@ -65,11 +56,6 @@ def parler(texte):
     print("🔊 Lecture terminée.")
 
     tts.stop()
-
-
-# ============================================================
-# GMAIL
-# ============================================================
 
 def connecter_gmail():
     creds = None
@@ -103,10 +89,6 @@ def connecter_gmail():
     )
 
 
-# ============================================================
-# EXTRACTION DU TEXTE DES MAILS
-# ============================================================
-
 def extraire_texte(part):
 
     resultat = ""
@@ -133,10 +115,6 @@ def extraire_texte(part):
 
     return resultat
 
-
-# ============================================================
-# RÉCUPÉRATION DES MAILS
-# ============================================================
 
 def recuperer_mails(service):
 
@@ -201,11 +179,6 @@ def recuperer_mails(service):
 
     return mails
 
-
-# ============================================================
-# NORMALISATION DE LA DEMANDE
-# ============================================================
-
 def normaliser_demande(texte):
 
     demande = texte.lower()
@@ -217,11 +190,6 @@ def normaliser_demande(texte):
     demande = demande.replace("e mails", "emails")
 
     return demande
-
-
-# ============================================================
-# TROUVER UN MAIL
-# ============================================================
 
 def trouver_mail(demande, mails):
 
@@ -325,11 +293,6 @@ def trouver_mail(demande, mails):
 
     return resultats[0][1]
 
-
-# ============================================================
-# RÉSUMÉ D'UN MAIL AVEC GROQ
-# ============================================================
-
 def resumer_mail(mail):
 
     contenu = mail["contenu"]
@@ -370,11 +333,6 @@ Règles :
 
     return response.output_text.strip()
 
-
-# ============================================================
-# RÉSUMER TOUS LES MAILS
-# ============================================================
-
 def resumer_tous_les_mails(mails):
 
     resultats = []
@@ -388,11 +346,6 @@ def resumer_tous_les_mails(mails):
         )
 
     return "\n\n".join(resultats)
-
-
-# ============================================================
-# AFFICHER LA LISTE DES MAILS
-# ============================================================
 
 def liste_mails(mails):
 
@@ -412,18 +365,9 @@ def liste_mails(mails):
 
     return texte
 
-
-# ============================================================
-# TRAITEMENT DE LA DEMANDE
-# ============================================================
-
 def traiter_demande(texte, mails):
 
     demande = normaliser_demande(texte)
-
-    # ----------------------------------------
-    # Nombre de mails
-    # ----------------------------------------
 
     if (
         "combien" in demande
@@ -438,10 +382,6 @@ def traiter_demande(texte, mails):
             f"mails aujourd'hui."
         )
 
-    # ----------------------------------------
-    # Demande de liste
-    # ----------------------------------------
-
     if (
         "quels" in demande
         or "liste" in demande
@@ -452,10 +392,6 @@ def traiter_demande(texte, mails):
     ):
 
         return liste_mails(mails)
-
-    # ----------------------------------------
-    # Résumé de tous les mails
-    # ----------------------------------------
 
     if (
         "résume mes mails" in demande
@@ -471,10 +407,6 @@ def traiter_demande(texte, mails):
             return "Tu n'as reçu aucun mail aujourd'hui."
 
         return resumer_tous_les_mails(mails)
-
-    # ----------------------------------------
-    # Recherche d'un mail précis
-    # ----------------------------------------
 
     mots_selection = [
         "ce mail",
@@ -513,10 +445,6 @@ def traiter_demande(texte, mails):
 
         return resumer_mail(mail)
 
-    # ----------------------------------------
-    # Demande générale → Groq
-    # ----------------------------------------
-
     prompt = f"""
 Tu es un assistant vocal personnel.
 
@@ -543,11 +471,6 @@ Demande de l'utilisateur :
 
     return response.output_text.strip()
 
-
-# ============================================================
-# RECONNAISSANCE VOCALE
-# ============================================================
-
 def ecouter():
 
     print("Parle maintenant...")
@@ -567,8 +490,6 @@ def ecouter():
         "float32"
     ) / 32768.0
 
-    # Évite les hallucinations lorsque
-    # le micro n'enregistre pratiquement rien
     if audio.max() - audio.min() < 0.02:
         return ""
 
@@ -585,11 +506,6 @@ def ecouter():
 
     return texte.strip()
 
-
-# ============================================================
-# PROGRAMME PRINCIPAL
-# ============================================================
-
 print("Connexion à Gmail...")
 
 service = connecter_gmail()
@@ -605,11 +521,6 @@ parler(
     f"Salut, tu as reçu {len(mails)} "
     f"mails aujourd'hui."
 )
-
-
-# ============================================================
-# BOUCLE PRINCIPALE
-# ============================================================
 
 continuer = True
 
