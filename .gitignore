@@ -1,3 +1,4 @@
 .env
+credentials.json
 audio.wav
 __pycache__/
