@@ -53,7 +53,7 @@ def parler(texte):
     tts.say(texte)
     tts.runAndWait()
 
-    print("🔊 Lecture terminée.")
+    print("Lecture terminée.")
 
     tts.stop()
 
